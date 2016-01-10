@@ -3,9 +3,9 @@ import os
 
 from core.worker import Worker
 
-def walk(parse_dir):
-  for name in os.listdir(parse_dir):
-    path = os.path.join(parse_dir, name)
+def walk(parseDir):
+  for name in os.listdir(parseDir):
+    path = os.path.join(parseDir, name)
     if os.path.isfile(path):
     	Worker(path).start() 
     else:

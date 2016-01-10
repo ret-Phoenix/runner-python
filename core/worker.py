@@ -1,6 +1,7 @@
 import threading
 import time
 import subprocess
+import sys
 
 from datetime import datetime, date
 from core.settings import Settings
@@ -8,28 +9,36 @@ from core.settings import Settings
 
 class Worker(threading.Thread):
 
-  def __init__(self, settings_file):
-    threading.Thread.__init__(self, name="Worker: " + settings_file)
-    settignsFromFile = Settings(settings_file)
-    self.settings = settignsFromFile.get_settings()
+  def __init__(self, settingsFile):
+    threading.Thread.__init__(self, name="Worker: " + settingsFile)
+    settignsFromFile = Settings(settingsFile)
+    self.settings = settignsFromFile.getSettings()
 
-  def writeToErrLog(self, msg):
-    err_log_file = open("error.log", "a")
-    err_log_file.write("---" + '\n')
-    err_log_file.write(str(datetime.today()) + '\n')
-    err_log_file.write(self.name + '\n')
-    err_log_file.write(str(msg) + '\n')
-    err_log_file.close()
+  def writeToLog(self, category, msg):
+    logFileName = self.settings["log"]
+    if (logFileName == ""):
+      logFileName = "running.log";
+    errLogFile = open("logs/"+logFileName, "a")
+    errLogFile.write("---" + '\n')
+    errLogFile.write(str(datetime.today()) + '\n')
+    errLogFile.write(self.name + '\n')
+    errLogFile.write(str(category) + '\n')
+    errLogFile.write(str(msg) + '\n')
+    errLogFile.close()
 
-  def run_application(self):
-    log = subprocess.Popen(self.settings["application"],
-      shell=True, stdout=subprocess.PIPE)
-    out = log.communicate()
-    test = log.returncode
-    if (test != 0):
-      self.writeToErrLog(out)    	
+  def runApplication(self):
+      log = subprocess.Popen(self.settings["application"],
+        shell=True, stdout=subprocess.PIPE)
+      out = log.communicate()
+      test = log.returncode
+      if (test != 0):
+        if (self.settings["logging-error"] == 1):
+          self.writeToLog('ERROR',out)
+      else:
+        if (self.settings["logging-success"] == 1):
+          self.writeToLog('SUCCESS',out)
 
   def run(self):
     while True:
-      self.run_application()
+      self.runApplication()
       time.sleep(self.settings["timeout"])

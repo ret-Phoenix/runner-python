@@ -4,14 +4,14 @@ import json
 
 
 class Settings:
-  def __init__(self, settings_file):
-    self.file_name = settings_file
+  def __init__(self, settingsFile):
+    self.fileName = settingsFile
 
-  def get_settings(self):
-    file_options = open(self.file_name, "r",1, 'utf8')
-    settings = json.load(file_options)
+  def getSettings(self):
+    fileOptions = open(self.fileName, "r",1, 'utf8')
+    settings = json.load(fileOptions)
     return settings
 
-  def set_settings(self, settings_data):
-    output = open(self.file_name, "w")
-    json.dump(settings_data, output)
+  def setSettings(self, settingsData):
+    output = open(self.fileName, "w")
+    json.dump(settingsData, output)
